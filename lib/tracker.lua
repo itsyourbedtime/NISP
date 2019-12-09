@@ -107,7 +107,9 @@ tracker.exec = function(self)
     
     for i = 1, 4 do
       self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
-      self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
+      if self.pos % (self.div[i] > 0 and self.div[i] or 1)  == 0 then
+        self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
+      end
     end
 
 end

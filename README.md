@@ -2,7 +2,7 @@
 
 *Scheme dialect livecoding tracker for norns*
 
-**Work in progress. Everything is subject to change** 
+**Work in progress. Everything is subject to change**
 
 
 ### Controls
@@ -34,12 +34,14 @@
 
 | function     |       arguments         |  description                                                
 |:-------------|:------------------------|:-----------------------------------------------------------
-| `(def)`      | `symbol, value`         | define a symbol                                             | 
+| `(def)`      | `symbol, value`         | define a symbol                                             |
 | `(lambda)`   | `args, function`        | anonymous function                                          |
 | `(quote)` `'`| `expr`                  | returns unevaluated expression                              |
-| `(if)`       | `cond, expr 1, expr 2`  | evaluate expr 1 if conf is true, else evaluates expr 2      |  
+| `(if)`       | `cond, expr 1, expr 2`  | evaluate expr 1 if cond is true, else evaluates expr 2      |  
+| `(when)`     | `cond, expr`            | evaluate expr if cond is true                               |  
 | `(@)`        | `track`  *<sup>optional*| returns current position                                    |
 | `(bpm)`      | `value`                 | set global bpm                                              |       
+| `(div)`      | `value`                 | set track speed divider                                     |       
 | `(jmp)`      | `pos`                   | jump to position                                            |
 | `(skip)`     | `pos`                   | skip current step                                           |               
 | `(ever)`     | `N, expr`               | evaluate expression every **N** cycle                       |              
@@ -56,7 +58,7 @@
 ###### Math
 `(+)`  `(-)` `(*)` `(/)` `(%)`  `(^)` `(=)` `(eq)` `(>)` `(<)` `(<=)` `(>=)` `(rnd)`
 ###### Other
-`(list)` `(list?)` `(append)` `(apply)` `(begin)` `(car)` `(cdr)` `(cons)` 
+`(list)` `(list?)` `(append)` `(apply)` `(begin)` `(car)` `(cdr)` `(cons)`
 `(len)` `(get)`  `(put)`  `(nil?)` `(num?)` `(print)` `(concat)` `(map)` `(#t)` `(#f)`
 
 
@@ -107,7 +109,7 @@
     f-lfo2 - filter_freq_mod_lfo_2
     p-lfo1 - pan_mod_lfo_1
     p-lfo2 - pan_mod_lfo_2
-    a-lfo1 - amp_mod_lfo_1 
+    a-lfo1 - amp_mod_lfo_1
     a-lfo2 - amp_mod_lfo_2
     fm-env - freq_mod_env
     f-fm-env - filter_freq_mod_env
@@ -116,11 +118,11 @@
     f-track - filter_tracking
     p-env - pan_mod_env
     m-atk - mod_env_attack
-    m-dec - mod_env_decay 
+    m-dec - mod_env_decay
     m-sus - mod_env_sustain
     m-rel - mod_env_release
 
-</details> 
+</details>
 
 
 
@@ -130,4 +132,3 @@
 ###### <sup>Known bugs-features:
 
 <sup>copy-pasted expression cells are linked, so editing one would affect all others.
-

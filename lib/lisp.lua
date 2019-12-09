@@ -17,6 +17,7 @@ local lisp = {
    pos = 1, subpos = {1, 1, 1, 1}, length = 16,
    mute ={ false, false, false, false},
    cycle = { 1, 1, 1, 1},
+   div = {1, 1, 1, 1},
    tr_now = 1, pos_now = 1,
 }
 
