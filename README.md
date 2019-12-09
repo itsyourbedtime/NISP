@@ -75,7 +75,7 @@
 
 (bpm 120) - set bpm to 120
 
-(jmp 0) - set current track position to the very beginning
+(jmp) - set current track position to the very beginning
 
 (pos (rnd 1 99)) - set random start position for current sample
 
