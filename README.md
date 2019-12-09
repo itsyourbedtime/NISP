@@ -11,6 +11,8 @@
 
 **`shift + ctrl`**|`start / stop playback`
 
+**`capslock`**|`toggle follow mode`
+
 **`shift + 1 - 4`**|`mute track`
 
 **`enter`**|`open text editor (third column of track must be selected)`
