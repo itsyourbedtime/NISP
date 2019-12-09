@@ -23,7 +23,7 @@
 
 **`shift + esc`**|`open / close norns menu`
 
-**`ctrl + left / right`**|`switch tabs`
+**`ctrl + left / right`**|`switch menu tabs`
 
 **`shift + up / down`**|`fast nav between samples in params menu`
 
