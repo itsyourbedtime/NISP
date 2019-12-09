@@ -26,7 +26,7 @@ local core = {
    ['lambda'] =  function( self, x, env ) return self.Proc(x[2], x[3], env) end,
    ['@'] = function( self, x, env ) return self.pos_now end,
    ['bpm'] = function( self, x, env ) self.bpm = self.eval(x[2], env) self.metro.time = 60 / self.bpm  / 4 end,
-   ['div'] = function(self, x, env) local div = tonumber(self.eval(x[2], env))  self.div[self.tr_now] = div or 1 print(self.div[self.tr_now]) end,
+   ['div'] = function(self, x, env) local div = tonumber(self.eval(x[2], env))  self.div[self.tr_now] = div or 1 end,
 
    ------
    ------

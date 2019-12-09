@@ -76,21 +76,29 @@ tracker.exec = function(self)
     local pos = self.pos
     
     for i = 1, 4 do
-        local tr    =  tr_i[i]
-        local step  =  self.subpos[i]
-        local s     =  tonumber(pat[step][tr[1]])
-        local n     =  get_note(pat[step][tr[2]])
-        local e, l  =  pat[step][tr[3]]
-        
-        if e then l = tracker.evaluate(self, e, i, step )  end
-
-        if not self.mute[i] then
+      
+      
+      self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
+      if self.pos % (self.div[i] > 0 and self.div[i] or 1)  == 0 then
+        self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
+      
+      
+          local tr    =  tr_i[i]
+          local step  =  self.subpos[i]
+          local s     =  tonumber(pat[step][tr[1]])
+          local n     =  get_note(pat[step][tr[2]])
+          local e, l  =  pat[step][tr[3]]
           
-            if s then
-              
-                if l ~= false then engine.noteOn(s, music.note_num_to_freq(n or 60), 1, s) end
-              
-            end
+          if e then l = tracker.evaluate(self, e, i, step )  end
+  
+          if not self.mute[i] then
+            
+              if s then
+                
+                  if l ~= false then engine.noteOn(s, music.note_num_to_freq(n or 60), 1, s) end
+                
+              end
+          end
         end
     end
     
@@ -106,10 +114,6 @@ tracker.exec = function(self)
     self.pos = self.pos >= self.length and 1 or self.pos + 1
     
     for i = 1, 4 do
-      self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
-      if self.pos % (self.div[i] > 0 and self.div[i] or 1)  == 0 then
-        self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
-      end
     end
 
 end
