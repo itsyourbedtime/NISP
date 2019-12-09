@@ -79,8 +79,10 @@ tracker.exec = function(self)
       
       
       self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
+      
       if self.pos % (self.div[i] > 0 and self.div[i] or 1)  == 0 then
-        self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
+          
+          self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
       
       
           local tr    =  tr_i[i]
@@ -113,9 +115,6 @@ tracker.exec = function(self)
     
     self.pos = self.pos >= self.length and 1 or self.pos + 1
     
-    for i = 1, 4 do
-    end
-
 end
 
 tracker.kb_event = function(typ, code, val, shift, k, pat, length)
