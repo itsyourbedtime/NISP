@@ -1,5 +1,8 @@
 # NISP
+
 *Scheme dialect livecoding tracker for norns*
+
+**Work in progress. Everything is subject to change** 
 
 
 ### Controls
