@@ -80,6 +80,12 @@ local core = {
 
    end,
 
+   ['length'] = function( self, x, env ) 
+        local length = self.eval(x[2], env) or 16
+        self.length = util.clamp(length, self.pos_now, 99)
+   end,
+
+
    ['save'] = function( self, x, env )
       local name = tostring(self.eval(x[2], env))
       local full_path = norns.state.data .. name ..".seq"

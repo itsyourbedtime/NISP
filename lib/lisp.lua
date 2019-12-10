@@ -64,7 +64,7 @@ lisp.init = function()
    lisp.std = lisp.Env({}, {}, {_find_= function() return nil end }) -- outer table doesn't exists
    for k,_ in pairs(lisp.core) do lisp.help = lisp.help ..' '.. k end 
    for k,v in pairs(stdlib) do lisp.std[k] = v lisp.help = lisp.help ..' '.. k  end -- functions
-   for k = 1, lisp.length do lisp.pat[k] = {nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil } end
+   for k = 1, 99 do lisp.pat[k] = {} end
 
    lisp:log('welcome to nisp')
 end

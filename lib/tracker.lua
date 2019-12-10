@@ -195,7 +195,7 @@ tracker.render = function(self)
       
         for i= 1, bounds_y do 
           local l = i + s_offset 
-  
+          if l > self.length then return false end
           screen.level(4)
           screen.move(7, i * 7)
           screen.text_right(l)
