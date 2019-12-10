@@ -41,6 +41,7 @@
 | `(when)`     | `cond, expr`            | evaluate expr if cond is true                               |  
 | `(@)`        | `track`  *<sup>optional*| returns current position                                    |
 | `(bpm)`      | `value`                 | set global bpm                                              |       
+| `(length)`   | `value`                 | set pattern length                                          |       
 | `(div)`      | `value`                 | set track speed divider                                     |       
 | `(jmp)`      | `pos`                   | jump to position                                            |
 | `(skip)`     | `pos`                   | skip current step                                           |               

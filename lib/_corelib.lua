@@ -82,7 +82,7 @@ local core = {
 
    ['length'] = function( self, x, env ) 
         local length = self.eval(x[2], env) or 16
-        self.length = util.clamp(length, self.pos_now, 99)
+        self.length = util.clamp(length, self.pos_now or 1, 99)
    end,
 
 
