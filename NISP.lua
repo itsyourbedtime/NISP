@@ -28,14 +28,13 @@ local function get_key(code, val, shift)
     end
 end
 
-
 function load_project(pth)
   if string.find(pth, '.seq') ~= nil then
     local saved = tab.load(pth)
     if saved ~= nil then
       print("data found")
-      lisp.pat = saved[2]
-      params:read(norns.state.data .. saved[1] ..".pset")
+      for k,v in pairs(saved[2]) do lisp[k] = v end
+      if saved[1] then params:read(norns.state.data .. saved[1] .. ".pset") end
     else
       print("no data")
     end
@@ -44,16 +43,13 @@ end
 
 function save_project(txt)
   if txt then
-    local l = { txt, lisp.pat }
-    local full_path = norns.state.data .. txt
-    tab.save(l, full_path ..".seq")
+    local data = { pat = lisp.pat, bpm = lisp.bpm, div = lisp.div, length = lisp.length, mute = lisp.mute }
+    tab.save({ txt, data }, norns.state.data .. txt ..".seq")
     params:write(full_path .. ".pset")
   else
     print("save cancel")
   end
 end
-
-
 
 function keyb.event(typ, code, val)
     local menu = norns.menu.status()
@@ -107,7 +103,6 @@ end
 function enc(n, d)
   --if n == 3 then offset = util.clamp(offset + d, 1, 64) end
 end
-
 
 function redraw()
     screen.clear()

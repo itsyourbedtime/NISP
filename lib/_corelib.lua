@@ -87,21 +87,15 @@ local core = {
 
 
    ['save'] = function( self, x, env )
-      local name = tostring(self.eval(x[2], env))
-      local full_path = norns.state.data .. name ..".seq"
-      tab.save(self.pat, full_path)
-   end,
+    local data = { pat = self.pat, bpm = self.bpm, div = self.div, length = self.length, mute = self.mute }
+    tab.save( { nil , data }, norns.state.data .. tostring(self.eval(x[2], env)) ..".seq") 
+ end,
 
-   ['load'] = function( self, x, env )
-      local name = tostring(self.eval(x[2], env))
-      local pth = norns.state.data .. name  .. ".seq"
-      local saved = tab.load(pth)
-      if saved ~= nil then 
-         self.length = #saved 
-         self.pat = saved 
-      end
-   end,
-   
+ ['load'] = function( self, x, env )
+    local saved = tab.load(norns.state.data .. tostring(self.eval(x[2], env))  .. ".seq")
+    if saved ~= nil then for k,v in pairs(saved[2]) do self[k] = v end end
+ end,
+    
  --------------------------------
  ---------SOUND-OPS--------------
  --------------------------------

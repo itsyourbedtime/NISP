@@ -10,7 +10,7 @@ local engines = include('lib/_engines')
 local tracker = include('lib/tracker')
 
 local lisp = {
-   output = {''}, metro = not debug_mode and metro.init() or '',
+   output = {''}, metro = metro.init(),
    core = include('lib/_corelib'), std = nil, log = utils.log,
    buf = {}, blink = false, bpm =  120, live = false,
    tracker = true, pat = {[0] = {}}, help = '',
