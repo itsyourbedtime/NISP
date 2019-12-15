@@ -91,10 +91,11 @@ local core = {
     tab.save( { nil , data }, norns.state.data .. tostring(self.eval(x[2], env)) ..".seq") 
  end,
 
- ['load'] = function( self, x, env )
+  ['load'] = function( self, x, env )
     local saved = tab.load(norns.state.data .. tostring(self.eval(x[2], env))  .. ".seq")
     if saved ~= nil then for k,v in pairs(saved[2]) do self[k] = v end end
- end,
+    self.metro:bpm_change(saved[2].bpm)
+  end,
     
  --------------------------------
  ---------SOUND-OPS--------------

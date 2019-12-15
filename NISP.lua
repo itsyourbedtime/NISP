@@ -34,6 +34,7 @@ function load_project(pth)
     if saved ~= nil then
       print("data found")
       for k,v in pairs(saved[2]) do lisp[k] = v end
+      lisp.metro:bpm_change(saved[2].bpm)
       if saved[1] then params:read(norns.state.data .. saved[1] .. ".pset") end
     else
       print("no data")
@@ -86,6 +87,7 @@ end
 
 function init()
     screen.aa(0)
+    math.randomseed(os.time())
     params:add_trigger('save_p', "< Save project" )
     params:set_action('save_p', function(x) textentry.enter(save_project,  'new') end)
     params:add_trigger('load_p', "> Load project" )
