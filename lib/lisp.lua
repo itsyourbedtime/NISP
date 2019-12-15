@@ -11,14 +11,13 @@ local tracker = include('lib/tracker')
 local beatclock = require('beatclock')
 
 local lisp = {
-   output = {''}, metro = beatclock.new(), --metro.init(),
+   output = {''}, metro = beatclock.new(),
    core = include('lib/_corelib'), std = nil, log = utils.log,
    buf = {}, blink = false, bpm =  120, live = false,
    tracker = true, pat = {[0] = {}}, help = '',
-   pos = 1, subpos = {1, 1, 1, 1}, length = 16,
-   mute ={ false, false, false, false},
-   cycle = { 1, 1, 1, 1},
-   div = {1, 1, 1, 1},
+   pos = 1, subpos = { 1, 1, 1, 1 }, length = 16,
+   mute ={ false, false, false, false },
+   cycle = { 1, 1, 1, 1 }, div = { 1, 1, 1, 1 },
    tr_now = 1, pos_now = 1,
 }
 
@@ -58,7 +57,7 @@ lisp.init = function()
     blinks:start()
     lisp.metro:add_clock_params()
     lisp.metro.on_step = function() tracker.exec(lisp) end 
-    lisp.metro.bpm = lisp.bpm
+    --lisp.metro.bpm = lisp.bpm
     engines.init()
    -- init environment
     lisp.std = lisp.Env({}, {}, {_find_= function() return nil end }) -- outer table doesn't exists

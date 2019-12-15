@@ -45,7 +45,7 @@ function save_project(txt)
   if txt then
     local data = { pat = lisp.pat, bpm = lisp.bpm, div = lisp.div, length = lisp.length, mute = lisp.mute }
     tab.save({ txt, data }, norns.state.data .. txt ..".seq")
-    params:write(full_path .. ".pset")
+    params:write( norns.state.data .. txt .. ".pset")
   else
     print("save cancel")
   end

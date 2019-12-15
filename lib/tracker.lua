@@ -71,19 +71,19 @@ tracker.evaluate = function(self, s, tr, pos)
 end
 
 tracker.exec = function(self)
+
+    self.pos = self.pos >= self.length and 1 or self.pos + 1
+
     local pat = self.pat
     local pos = self.pos
     
     for i = 1, 4 do
       
-      
-    self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
-    self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
-    
       if self.pos % (self.div[i] > 0 and self.div[i] or 1)  == 0 then
-          
       
-      
+        self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
+        self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
+
           local tr    =  tr_i[i]
           local step  =  self.subpos[i]
           local s     =  tonumber(pat[step][tr[1]])
@@ -112,8 +112,6 @@ tracker.exec = function(self)
     
     end
     
-    self.pos = self.pos >= self.length and 1 or self.pos + 1
-
 end
 
 tracker.kb_event = function(typ, code, val, shift, k, pat, length)

@@ -46,7 +46,7 @@ local core = {
       end,
    
    ['jmp'] = function( self, x, env )
-          local l =  util.clamp(self.eval(x[2], env) - 1, 0, self.length)
+          local l =  util.clamp(self.eval(x[2], env) or 1 - 1, 0, self.length)
           self.subpos[self.tr_now] = l or 0
    end,
    
@@ -75,8 +75,8 @@ local core = {
    ['ever'] = function( self, x, env )
       local s = self.eval(x[2], env)
         if self.cycle[self.tr_now] % s  == 0 then 
-          self.cycle[self.tr_now] = self.cycle[self.tr_now] + 1
-          return self.eval(x[3], env)   end
+          self.cycle[self.tr_now] = 1
+        return self.eval(x[3], env)   end
 
    end,
 
