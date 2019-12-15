@@ -8,9 +8,10 @@ local utils = include('lib/utils')
 local repl = include('lib/repl')
 local engines = include('lib/_engines')
 local tracker = include('lib/tracker')
+local beatclock = require('beatclock')
 
 local lisp = {
-   output = {''}, metro = metro.init(),
+   output = {''}, metro = beatclock.new(), --metro.init(),
    core = include('lib/_corelib'), std = nil, log = utils.log,
    buf = {}, blink = false, bpm =  120, live = false,
    tracker = true, pat = {[0] = {}}, help = '',
@@ -43,7 +44,7 @@ function lisp.kb_event(typ, code, val, shift, ctrl, k)
     end
    if (code == 28) and val == 1 then if lisp.live then repl.evaluate(lisp) end end
    if shift and ctrl then
-      if lisp.metro.is_running then lisp.metro:stop() lisp:log('> stopped.')
+      if lisp.metro.playing then lisp.metro:stop() lisp:log('> stopped.')
       else lisp.metro:start() lisp:log('> running..') end
    end
 end
@@ -53,20 +54,19 @@ lisp.enc = function(self, n, d)
 end
 
 lisp.init = function()
-   if not debug_mode then
-      local l = metro.init( function() lisp.blink = not lisp.blink end, 0.7)
-      l:start()
-      engines.init()
-      lisp.metro.event = function() tracker.exec(lisp) end 
-      lisp.metro.time = 60 / lisp.bpm / 4
-   end
+    local blinks = metro.init( function() lisp.blink = not lisp.blink end, 0.7)
+    blinks:start()
+    lisp.metro:add_clock_params()
+    lisp.metro.on_step = function() tracker.exec(lisp) end 
+    lisp.metro.bpm = lisp.bpm
+    engines.init()
    -- init environment
-   lisp.std = lisp.Env({}, {}, {_find_= function() return nil end }) -- outer table doesn't exists
-   for k,_ in pairs(lisp.core) do lisp.help = lisp.help ..' '.. k end 
-   for k,v in pairs(stdlib) do lisp.std[k] = v lisp.help = lisp.help ..' '.. k  end -- functions
-   for k = 1, 99 do lisp.pat[k] = {} end
+    lisp.std = lisp.Env({}, {}, {_find_= function() return nil end }) -- outer table doesn't exists
+    for k,_ in pairs(lisp.core) do lisp.help = lisp.help ..' '.. k end 
+    for k,v in pairs(stdlib) do lisp.std[k] = v lisp.help = lisp.help ..' '.. k  end -- functions
+    for k = 1, 99 do lisp.pat[k] = {} end
 
-   lisp:log('welcome to nisp')
+    lisp:log('welcome to nisp')
 end
 
 ----------

@@ -95,7 +95,7 @@ function init()
     params:add_separator()
 
     lisp.init()
-    local metro_redraw = metro.init( function() redraw() end, 1 / 16)
+    local metro_redraw = metro.init( function() redraw() end, 1 / 30)
     metro_redraw:start()
 
 end

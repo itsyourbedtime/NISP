@@ -25,7 +25,7 @@ local core = {
    ['def'] =  function( self, x, env ) env[x[2]] = self.eval(x[3], env) end,
    ['lambda'] =  function( self, x, env ) return self.Proc(x[2], x[3], env) end,
    ['@'] = function( self, x, env ) return self.pos_now end,
-   ['bpm'] = function( self, x, env ) self.bpm = self.eval(x[2], env) self.metro.time = 60 / self.bpm  / 4 end,
+   ['bpm'] = function( self, x, env ) self.bpm = self.eval(x[2], env) self.metro:bpm_change(self.bpm) end,
    ['div'] = function(self, x, env) local div = tonumber(self.eval(x[2], env))  self.div[self.tr_now] = div or 1 end,
 
    ------
@@ -135,10 +135,10 @@ end,
 
   for k, v in pairs(shortenings) do
    core[k] = function(self, x, env)
-       local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2] or false
-       if s_id or not tonumber(s_id) then return false end
-       local val = self.eval(x[2], env)
-       if val then params:set( param_ids[v] .. "_" .. s_id , val ) end
+      local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2] or false
+      if not s_id or not tonumber(s_id) then return false end
+      local val = self.eval(x[2], env)
+      if val then params:set( shortenings[v] .. "_" .. s_id , val ) end
     end
   end
   

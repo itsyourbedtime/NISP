@@ -9,7 +9,7 @@ local utils = include('lib/utils')
 
 stdlib['#t'] = true
 
-stdlib['halt'] = function () return false end
+stdlib['#f'] = function () return false end
 --- math
 stdlib['+'] = function(...) local r = 0 for i=1,select("#",...) do r = r + select(i,...) end return r end
 

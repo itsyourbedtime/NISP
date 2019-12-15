@@ -9,8 +9,7 @@ local textedit = include('lib/textedit')
 local utils = include('lib/utils')
 ---
 local tr_i = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12} }
-local tracker = { pos = { x = 1, y = 1}, edit = false, 
-  buffer = { cell = nil,  expr = nil }, }
+local tracker = { pos = { x = 1, y = 1}, edit = false,  buffer = { cell = nil,  expr = nil }, }
 local s_offset, bounds_y, w = 0, 9, {}
 local attached = false
 
@@ -78,11 +77,11 @@ tracker.exec = function(self)
     for i = 1, 4 do
       
       
-      self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
-      
+    self.cycle[i] = self.pos >= self.length and self.cycle[i] + 1 or self.cycle[i]
+    self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
+    
       if self.pos % (self.div[i] > 0 and self.div[i] or 1)  == 0 then
           
-          self.subpos[i] = self.subpos[i] >= self.length and 1 or self.subpos[i] + 1 
       
       
           local tr    =  tr_i[i]
@@ -114,7 +113,7 @@ tracker.exec = function(self)
     end
     
     self.pos = self.pos >= self.length and 1 or self.pos + 1
-    
+
 end
 
 tracker.kb_event = function(typ, code, val, shift, k, pat, length)
