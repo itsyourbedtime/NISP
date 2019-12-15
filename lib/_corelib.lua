@@ -104,7 +104,7 @@ local core = {
       local step = self.eval(x[2], env) 
       self.pat[step][self.tr_now * 3 - 1] = self.eval(x[3], env) 
     else
-      self.pat[self.pos_now][self.tr_now * 3 - 1] = self.eval(x[2], env) 
+      self.pat[self.pos_now][self.tr_now * 3 - 1] = util.clamp(self.eval(x[2], env), 0, 99)
     end
  end,
  
@@ -114,7 +114,7 @@ local core = {
       local step = self.eval(x[2], env) 
       self.pat[step][self.tr_now * 3 - 2] = self.eval(x[3], env) 
     else
-      self.pat[self.pos_now][self.tr_now * 3 - 2] = self.eval(x[2], env) 
+      self.pat[self.pos_now][self.tr_now * 3 - 2] = util.clamp(self.eval(x[2], env), 0, 99)
     end
  end,
    
@@ -136,9 +136,9 @@ end,
   for k, v in pairs(shortenings) do
    core[k] = function(self, x, env)
       local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2] or false
-      if not s_id or not tonumber(s_id) then return false end
+      if not s_id then return false end
       local val = self.eval(x[2], env)
-      if val then params:set( shortenings[v] .. "_" .. s_id , val ) end
+      if val then params:set( shortenings[k] .. "_" .. s_id , val ) end
     end
   end
   
