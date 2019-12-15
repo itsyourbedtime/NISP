@@ -9,14 +9,15 @@ local textedit = include('lib/textedit')
 local utils = include('lib/utils')
 ---
 local tr_i = { {1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12} }
-local tracker = { pos = { x = 1, y = 1}, edit = false,  buffer = { cell = nil,  expr = nil }, }
-local s_offset, bounds_y, w = 0, 9, {}
-local attached = false
-
+local tracker = { pos = { x = 1, y = 1}, edit = false,  buffer = { nil,  nil }, }
+local bars = { [1] = { 11, 28, 31 }, [2] = { 39, 31, 61 }, [3] = { 69, 31, 91 }, [4] = { 99, 30, 121 } } 
+local s_offset, bounds_y, w, attached = 0, 9, {}, false
+---
 local function tr_spacing(tr) return (30 * tr) - 17 end
 local function cursor_pos(x, y) return (y == tracker.pos.y and tracker.pos.x == x) and 9 or 1 end
-local function format_val(v) return (v and string.len(v) < 2) and v .. '-' or v and v or '--' end 
-  
+local function format_val(v) return (v and string.len(v) < 2) and v .. '-' or v and v or '--' end
+local function not_empty(t) for i=1,#t do if #t[i] > 0 then return true end end end
+
 local function get_note(n)
   if n and string.match(n, '%a%d') then
     return utils.note_name_to_num(n)
@@ -25,31 +26,27 @@ local function get_note(n)
   end
 end
 
-
-tracker.copy = function(self)
-  if tracker.pos.x % 3 == 0 then
-    self.buf[1] =  self.pat[tracker.pos.y][tracker.pos.x]
-    return self.buf[1]
+tracker.copy = function(self, p)
+  if self.pos.x % 3 == 0 then
+    self.buffer[1] =  p
   else
-    self.buf[2] = self.pat[tracker.pos.y][tracker.pos.x]
-    return self.buf[2]
+    self.buffer[2] = p
   end
 end
 
 tracker.paste = function(self)
-  if tracker.pos.x % 3 == 0 then
-    self.pat[tracker.pos.y][tracker.pos.x] = self.buf[1]
+  if self.pos.x % 3 == 0 then
+    return self.buffer[1]
   else
-    self.pat[tracker.pos.y][tracker.pos.x] =  self.buf[2] 
+    return self.buffer[2] 
   end
 end
-
 
 tracker.buildword = function(self, keyinput, pat)
     if keyinput ~= nil then
         if #w <= 1 then
-          table.insert(w, keyinput)
           if self.pos.x % 3 ~= 0 then
+              table.insert(w, keyinput)
               local str = table.concat(w)
               if string.match(str, '%w') then
                   pat[self.pos.y][self.pos.x] = str
@@ -72,8 +69,6 @@ end
 
 tracker.exec = function(self)
 
-    self.pos = self.pos >= self.length and 1 or self.pos + 1
-
     local pat = self.pat
     local pos = self.pos
     
@@ -91,17 +86,12 @@ tracker.exec = function(self)
           local e, l  =  pat[step][tr[3]]
           
           if e then l = tracker.evaluate(self, e, i, step )  end
-  
-          if not self.mute[i] then
-            
-              if s then
-                
-                  if l ~= false then engine.noteOn(s, music.note_num_to_freq(n or 60), 1, s) end
-                
+    
+              if not self.mute[i] and s then
+                  engine.noteOn(s, music.note_num_to_freq(n or 60), 1, s) 
               end
           end
-        end
-    end
+      end
     
     if attached then
       
@@ -112,6 +102,8 @@ tracker.exec = function(self)
     
     end
     
+    self.pos = self.pos >= self.length and 1 or self.pos + 1
+
 end
 
 tracker.kb_event = function(typ, code, val, shift, k, pat, length)
@@ -119,7 +111,8 @@ tracker.kb_event = function(typ, code, val, shift, k, pat, length)
     if tracker.edit then
         if code == 1 and down then tracker.edit = false end
         if code == 28 and down and shift then 
-          pat[tracker.pos.y][tracker.pos.x] = textedit:kb(typ, code, val, shift, k) 
+          textedit.evaluated = true 
+          pat[tracker.pos.y][tracker.pos.x] = textedit:store()
         end
         textedit:kb(typ, code, val, shift, k) 
     else
@@ -150,10 +143,9 @@ tracker.kb_event = function(typ, code, val, shift, k, pat, length)
               pat[tracker.pos.y][tracker.pos.x] = nil
             end
         elseif code == 28 and down then
-            if (not tracker.edit and tracker.pos.x % 3 == 0) then tracker.edit = true
-                if pat[tracker.pos.y][tracker.pos.x] then
-                  textedit:open(pat[tracker.pos.y][tracker.pos.x]) 
-                end
+            if (not tracker.edit and tracker.pos.x % 3 == 0) then 
+                textedit:open(pat[tracker.pos.y][tracker.pos.x]) 
+                tracker.edit = true
             end
         end
         
@@ -168,26 +160,15 @@ tracker.render = function(self)
       textedit.render(self.blink, self.pos, self.output)
     else
       screen.level(3)
-       if not self.mute[1] then 
-         screen.rect(11,  ((self.subpos[1] - s_offset) * 7)  - 6, 28, 7) 
+      
+      for i = 1, 4 do
+       if not self.mute[i] then 
+         screen.rect(bars[i][1],  ((self.subpos[i] - s_offset) * 7)  - 6, bars[i][2], 7) 
        else 
-         screen.rect(31,  ((self.subpos[1] - s_offset) * 7)  - 6, 7, 7) 
+         screen.rect(bars[i][3],  ((self.subpos[i] - s_offset) * 7)  - 6, 7, 7) 
         end
-       if not self.mute[2] then 
-         screen.rect(39, ((self.subpos[2] - s_offset) * 7)  - 6, 31, 7) 
-       else
-         screen.rect(61, ((self.subpos[2] - s_offset) * 7)  - 6, 7, 7) 
-       end
-       if not self.mute[3] then 
-         screen.rect(69, ((self.subpos[3] - s_offset) * 7)  - 6, 31, 7) 
-       else
-         screen.rect(91, ((self.subpos[3] - s_offset) * 7)  - 6, 7, 7) 
-       end
-       if not self.mute[4] then 
-         screen.rect(99, ((self.subpos[4] - s_offset) * 7)  - 6, 30, 7) 
-       else
-         screen.rect(121, ((self.subpos[4] - s_offset) * 7)  - 6, 7, 7) 
-       end
+      end
+      
         screen.fill()
       
         for i= 1, bounds_y do 
@@ -213,7 +194,7 @@ tracker.render = function(self)
               
               screen.level(cursor_pos(tr[3], l))
               screen.move(tr_spacing(k) + 20, i  * 7)
-              screen.text((expr and #expr[1] > 0) and '*' or '-')
+              screen.text(not_empty(expr or {}) and '*'  or '-')
           end
           screen.stroke()
         end

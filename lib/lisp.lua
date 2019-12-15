@@ -28,12 +28,12 @@ function lisp.kb_event(typ, code, val, shift, ctrl, k)
      tracker.kb_event(typ, code, val, shift, k, lisp.pat, lisp.length)
      if ctrl then
         if code == 45 then 
-            tracker.copy(lisp)
+            tracker:copy(lisp.pat[tracker.pos.y][tracker.pos.x])
             lisp.pat[tracker.pos.y][tracker.pos.x] = nil
         elseif code == 46 then 
-            tracker.copy(lisp)
+            tracker:copy(lisp.pat[tracker.pos.y][tracker.pos.x])
         elseif code == 47 then
-            tracker.paste(lisp)
+            lisp.pat[tracker.pos.y][tracker.pos.x] = tracker:paste()
         end
       elseif val > 0 and shift and (code >= 5 or code >= 2) then
         lisp.mute[code - 1] = not lisp.mute[code - 1]
@@ -99,8 +99,8 @@ lisp.eval = function (x, env)
       if tonumber(x) then return tonumber(x) end    -- is number
       if x == nil then return false end
       if string.find(x, '".*"') then return x end   -- is string ("" must be used)
-      --lisp:log('Undefined: ' .. utils.tostring(x))
-      lisp.err('unknown: ' .. utils.tostring(x))
+      lisp:log('Undefined: ' .. utils.tostring(x))
+      --lisp.err('unknown: ' .. utils.tostring(x))
       return nil
    else
       if lisp.core[x[1]] then

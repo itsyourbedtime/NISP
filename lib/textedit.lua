@@ -10,6 +10,14 @@ local textedit = {
     evaluated = false,
 }
 
+textedit.open = function(self, t)
+  self.lines = t or {{},{},{},{},{},{},{}}
+end
+
+textedit.store = function(self)
+  return self.lines
+end
+
 textedit.buildword = function(self, keyinput)
     if keyinput ~= nil then
         if self.pos.x ~= 1 then
@@ -22,14 +30,11 @@ textedit.buildword = function(self, keyinput)
         else
             table.insert(self.lines[self.pos.y], keyinput)
         end
-        
-          if #self.lines[self.pos.y] > 32 then
-            self.pos.y = util.clamp(self.pos.y + 1, 1, 7)
-            self.pos.x = 1
-          end
+        if #self.lines[self.pos.y] > 32 then
+          self.pos.y = util.clamp(self.pos.y + 1, 1, 7)
+          self.pos.x = 1
+        end
     end
-    
-    --xreturn self.lines
 end
 
 textedit.rm = function(self, back)
@@ -42,62 +47,43 @@ textedit.rm = function(self, back)
         if (#self.lines[self.pos.y] + self.pos.x) > 1 then
             table.remove(self.lines[self.pos.y],  util.clamp((#self.lines[self.pos.y] + self.pos.x) - 1, 0, #self.lines[self.pos.y]))
         end
-        
         if #self.lines[self.pos.y] + self.pos.x == 1 then
             self.pos.y = util.clamp(self.pos.y - 1, 1, #self.lines)
         end
     end
 end
 
-textedit.open = function(self, t)
-  self.lines = t
-end
-
 textedit.kb = function(self, typ, code, val, shift, k)
     local down = val > 0 
     if ( code == 103) and down then 
         self.pos.y = util.clamp(self.pos.y - 1, 1, #self.lines)
-        --self.pos.x = self.pos.x - 2 --#self.lines[self.pos.y - 1] == 0 and 0 or self.pos.x
     elseif ( code == 105) and down then 
         self.pos.x = util.clamp(self.pos.x - 1, (-#self.lines[self.pos.y] + 1) , 1)
     elseif ( code == 106) and down then 
         self.pos.x = util.clamp(self.pos.x + 1, (-#self.lines[self.pos.y] + 1), 1)
     elseif ( code == 108) and down then 
         self.pos.y = util.clamp(self.pos.y + 1, 1, #self.lines)
-       -- self.pos.x = self.pos.x + 2 -- #self.lines[self.pos.y + 1] == 0 and 0 or self.pos.x
     elseif code == 14 and down then 
         self:rm(false)
     elseif code == 111 and down then 
         self:rm(true)
     elseif (code == 28) and val == 1 then
         if not shift then
-            local l = {}
             self.pos.y = util.clamp(self.pos.y + 1, 1, 7)
-            --self.pos.x = #self.lines[self.pos.y + 1] == 0 and 1 or self.pos.x
-        else 
-            self.evaluated = true
-            --local expr = self:buildword(k)
-            return self.lines
         end
     end
     if #self.lines[self.pos.y] < 1 then self.pos.x = 1 end
-    local expr = self:buildword(k)
-    if code == 1 and down then self.lines = {{},{},{},{},{},{}, {}} self.pos = {x = 1, y = 1} return self.lines  end
-end
-
-move_string = function()
-  local l = {}
+    self:buildword(k)
 end
 
 textedit.render = function(blink, run, output)
+    screen.font_face(25)
+    screen.font_size(6)
 
     screen.level(run % 2 == 0 and 6 or 1)
     screen.rect(124, 60, 4, 4)
     screen.fill()
 
-    screen.font_face(25)
-    screen.font_size(6)
-    
     if textedit.evaluated then
         screen.level(2)
         screen.rect(0, 0, 128, 57)
@@ -125,6 +111,5 @@ textedit.render = function(blink, run, output)
         screen.fill()
     end
 end
-
 
 return textedit
