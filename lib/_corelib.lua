@@ -120,8 +120,8 @@ local core = {
    
 
 ['pos'] = function( self, x, env )
-  local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2]:gsub("^0", "")
-  if not s_id or tonumber(s_id) then return false end
+  local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2] or false
+  if not s_id or not tonumber(s_id) then return false end
   local length = params:get("end_frame_" .. s_id)
   local val = self.eval(x[2])
   local start_pos = util.clamp((tonumber(val) / 100 ) * length, 0, length ) 
@@ -135,7 +135,7 @@ end,
 
   for k, v in pairs(shortenings) do
    core[k] = function(self, x, env)
-       local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2]:gsub("^0", "")
+       local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2] or false
        if s_id or not tonumber(s_id) then return false end
        local val = self.eval(x[2], env)
        if val then params:set( param_ids[v] .. "_" .. s_id , val ) end
