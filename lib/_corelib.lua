@@ -77,25 +77,24 @@ local core = {
         if self.cycle[self.tr_now] % s  == 0 then 
             return self.eval(x[3], env)  
         end
-
    end,
 
-   ['length'] = function( self, x, env ) 
+    ['length'] = function( self, x, env ) 
         local length = self.eval(x[2], env) or 16
         self.length = util.clamp(length, self.pos_now or 1, 99)
-   end,
+    end,
 
 
    ['save'] = function( self, x, env )
-    local data = { pat = self.pat, bpm = self.bpm, div = self.div, length = self.length, mute = self.mute }
-    tab.save( { nil , data }, norns.state.data .. tostring(self.eval(x[2], env)) ..".seq") 
- end,
+        local data = { pat = self.pat, bpm = self.bpm, div = self.div, length = self.length, mute = self.mute }
+        tab.save( { nil , data }, norns.state.data .. tostring(self.eval(x[2], env)) ..".seq") 
+    end,
 
-  ['load'] = function( self, x, env )
-    local saved = tab.load(norns.state.data .. tostring(self.eval(x[2], env))  .. ".seq")
-    if saved ~= nil then for k,v in pairs(saved[2]) do self[k] = v end end
-    self.metro:bpm_change(saved[2].bpm)
-  end,
+    ['load'] = function( self, x, env )
+        local saved = tab.load(norns.state.data .. tostring(self.eval(x[2], env))  .. ".seq")
+        if saved ~= nil then for k,v in pairs(saved[2]) do self[k] = v end end
+        self.metro:bpm_change(saved[2].bpm)
+    end,
     
  --------------------------------
  ---------SOUND-OPS--------------
@@ -121,8 +120,8 @@ local core = {
    
 
 ['pos'] = function( self, x, env )
-  local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2] or false
-  if not s_id or not tonumber(s_id) then return false end
+  local s_id = tonumber(self.pat[self.pos_now][self.tr_now * 3 - 2]) or false
+  if not s_id then return false end
   local length = params:get("end_frame_" .. s_id)
   local val = self.eval(x[2])
   local start_pos = util.clamp((tonumber(val) / 100 ) * length, 0, length ) 
@@ -136,7 +135,7 @@ end,
 
   for k, v in pairs(shortenings) do
    core[k] = function(self, x, env)
-      local s_id = self.pat[self.pos_now][self.tr_now * 3 - 2] or false
+      local s_id = tonumber(self.pat[self.pos_now][self.tr_now * 3 - 2]) or false
       if not s_id then return false end
       local val = self.eval(x[2], env)
       if val then params:set( shortenings[k] .. "_" .. s_id , val ) end
