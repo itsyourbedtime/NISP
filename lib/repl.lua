@@ -1,4 +1,4 @@
--- 
+--
 -- repl module
 -- @its_your_bedtime
 --
@@ -34,7 +34,7 @@ repl.buildword = function(self, keyinput)
         else
             table.insert(self.lines[self.pos.y], keyinput)
         end
-        
+
         if #self.lines[self.pos.y] >= 31 then
             self.view = util.clamp(self.view - 1, 4, 10)
             self.pos.y = util.clamp(self.pos.y + 1, 1, 7)
@@ -46,7 +46,7 @@ end
 repl.rm = function(self, back)
     if back then
         if (#self.lines[self.pos.y] + self.pos.x) <= #self.lines[self.pos.y] then
-          
+
             table.remove(self.lines[self.pos.y],  util.clamp((#self.lines[self.pos.y] + self.pos.x), 0, #self.lines[self.pos.y]))
             self.pos.x = self.pos.x + 1
         end
@@ -62,53 +62,52 @@ repl.rm = function(self, back)
     end
 end
 
-repl.kb = function(self, typ, code, val, shift)
-    local down = val > 0 
-    if ( code == 103) and down then 
-      if self.nl == 0 then 
+repl.kb = function(self)
+    if keyboard.state.UP then
+      if self.nl == 0 then
         self:upd_hist(1)
       else
         self.pos.y = util.clamp(self.pos.y - 1, 1, #self.lines)
         self.pos.x = 1
       end
-    elseif ( code == 105) and down then 
+    elseif keyboard.state.LEFT then
         self.pos.x = util.clamp(self.pos.x - 1, ((-#self.lines[self.pos.y])+ 1) , 1)
-    elseif ( code == 106) and down then 
+    elseif keyboard.state.RIGHT then
         self.pos.x = util.clamp(self.pos.x + 1,( -#self.lines[self.pos.y]), 1)
-    elseif ( code == 108) and down then 
+    elseif keyboard.state.DOWN then
       if self.nl == 0 then
         self:upd_hist(-1)
       else
         self.pos.y = util.clamp(self.pos.y + 1, 1, #self.lines )
         self.pos.x = 1
       end
-    elseif code == 14 and down then 
+    elseif keyboard.state.BACKSPACE then
         self:rm(false)
-    elseif code == 111 and down then 
+    elseif keyboard.state.DELETE then
         self:rm(true)
-    elseif (code == 28) and val == 1 then
+    elseif keyboard.state.ENTER then
         self.pos.y = util.clamp(self.pos.y + 1, 1, 7)
         self.pos.x = #self.lines[self.pos.y + 1] > 0 and #self.lines[self.pos.y] or 1
     end
 end
 
 repl.evaluate = function(self)
-  
+
       local f = ''
       for i = 1, #repl.lines do
           local l = table.concat(repl.lines[i])
           f = f .. tostring(l)
       end
-      
+
       repl.nl = 0
-      
-      for c in f:gmatch('[()]') do 
+
+      for c in f:gmatch('[()]') do
           repl.nl = util.clamp(repl.nl + (c == '(' and 1 or -1), 0, 8)
       end
       table.insert(repl.lines[repl.pos.y],'\n')
       repl.view = util.clamp(repl.view - repl.nl, 3, 10)
 
-      if repl.nl == 0 then 
+      if repl.nl == 0 then
           repl.view = 10
           repl.pos.y,repl.pos.x = 1, 1
       if string.len(f:gsub("%s+", "")) > 0 then
@@ -133,7 +132,7 @@ repl.render = function(self, blink)
     screen.font_face(25)
     screen.font_size(6)
     screen.level(15)
-        
+
     for i = 1, #repl.lines do
         local rev = #repl.lines - i
         local l = table.concat(repl.lines[i])
@@ -141,9 +140,9 @@ repl.render = function(self, blink)
         screen.text((i == 1 and '>' or '') .. tostring(l))
         screen.stroke()
     end
-    
+
     screen.level(3)
-    
+
     for i = #self.output - 8, #self.output do
         screen.move(0, (62 + (((line + repl.view) - 20) * 7)))
         screen.text(tostring(self.output[i - repl.offset.x] or ''))

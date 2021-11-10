@@ -18,8 +18,8 @@ utils.note_name_to_num = function(note_str)
 end
 
 utils.join = function(a, b)
-  for i=2,#b do 
-    table.insert(a, b[i]) 
+  for i=2,#b do
+    table.insert(a, b[i])
   end
 end
 
@@ -37,8 +37,8 @@ utils.tostring = function (lst, f)
 end
 
 utils.log = function(self, st)
-  if #self.output > 500 then local h,o = 1,{} 
-      for i = 492, 500 do o[h] = self.output[i] 
+  if #self.output > 500 then local h,o = 1,{}
+      for i = 492, 500 do o[h] = self.output[i]
       h = h + 1 end self.output = o
   end
   local str = utils.tostring(st)
@@ -47,7 +47,7 @@ utils.log = function(self, st)
   if string.len(s) == 0  then return false
   elseif string.len(s) > 33 then
       local b = string.sub(str, 31)
-      self.output[#self.output] =  s 
+      self.output[#self.output] =  s
       self.output[#self.output + 1] = b
       if string.len(b) > 33 then utils.log(self, string.sub(b, 31)) end
     else
@@ -66,6 +66,15 @@ utils.update_offset = function(val, y, length, bounds, offset)
   return val
 end
 
+
+utils.tab_key = function (t, e)
+  local index={}
+  for k, v in pairs(t) do
+    if v == e then
+      return k
+    end
+  end
+end
 
 
 return utils

@@ -1,4 +1,4 @@
--- 
+--
 -- simple text editor
 -- @its_your_bedtime
 --
@@ -26,7 +26,7 @@ textedit.buildword = function(self, keyinput)
               local l = self.lines[self.pos.y][#self.lines[self.pos.y]]
               table.remove(self.lines[self.pos.y], #self.lines[self.pos.y])
               table.insert(self.lines[self.pos.y + 1], 1, l)
-            end          
+            end
         else
             table.insert(self.lines[self.pos.y], keyinput)
         end
@@ -53,26 +53,29 @@ textedit.rm = function(self, back)
     end
 end
 
-textedit.kb = function(self, typ, code, val, shift, k)
-    local down = val > 0 
-    if ( code == 103) and down then 
-        self.pos.y = util.clamp(self.pos.y - 1, 1, #self.lines)
-    elseif ( code == 105) and down then 
-        self.pos.x = util.clamp(self.pos.x - 1, (-#self.lines[self.pos.y] + 1) , 1)
-    elseif ( code == 106) and down then 
-        self.pos.x = util.clamp(self.pos.x + 1, (-#self.lines[self.pos.y] + 1), 1)
-    elseif ( code == 108) and down then 
-        self.pos.y = util.clamp(self.pos.y + 1, 1, #self.lines)
-    elseif code == 14 and down then 
-        self:rm(false)
-    elseif code == 111 and down then 
-        self:rm(true)
-    elseif (code == 28) and val == 1 then
-        if not shift then
-            self.pos.y = util.clamp(self.pos.y + 1, 1, 7)
-        end
-    end
-    if #self.lines[self.pos.y] < 1 then self.pos.x = 1 end
+textedit.kb_code = function(self, c, val)
+  if keyboard.state.UP then
+    self.pos.y = util.clamp(self.pos.y - 1, 1, #self.lines)
+  elseif keyboard.state.LEFT then
+      self.pos.x = util.clamp(self.pos.x - 1, (-#self.lines[self.pos.y] + 1) , 1)
+  elseif keyboard.state.RIGHT then
+      self.pos.x = util.clamp(self.pos.x + 1, (-#self.lines[self.pos.y] + 1), 1)
+  elseif keyboard.state.DOWN then
+      self.pos.y = util.clamp(self.pos.y + 1, 1, #self.lines)
+  elseif keyboard.state.BACKSPACE then
+      self:rm(false)
+  elseif keyboard.state.DELETE then
+      self:rm(true)
+  elseif keyboard.state.ENTER then
+      if not keyboard.shift() then
+          self.pos.y = util.clamp(self.pos.y + 1, 1, 7)
+      end
+  end
+  if #self.lines[self.pos.y] < 1 then self.pos.x = 1 end
+end
+
+
+textedit.kb_char = function(self, k)
     self:buildword(k)
 end
 
@@ -92,14 +95,14 @@ textedit.render = function(blink, run, output)
     end
 
     screen.level(15)
-    
+
     for i = 1, #textedit.lines do
         screen.move(0, 8 * i)
         local l = table.concat(textedit.lines[i])
         screen.text(tostring(l))
         screen.stroke()
     end
-    
+
     screen.level(3)
     screen.move(0, 63)
     screen.text(output[#output])
