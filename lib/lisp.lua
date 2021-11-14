@@ -1,8 +1,9 @@
--- 
+--
 -- lisp core
 -- @its_your_bedtime
 --
 
+local keyboard = require 'core/keyboard'
 local stdlib = include('lib/_stdlib')
 local utils = include('lib/utils')
 local repl = include('lib/repl')
@@ -21,31 +22,49 @@ local lisp = {
    tr_now = 1, pos_now = 1,
 }
 
-
-function lisp.kb_event(typ, code, val, shift, ctrl, k)
-   if lisp.live then repl:kb(typ, code, val, shift) repl:buildword(k)
-   elseif lisp.tracker then
-     tracker.kb_event(typ, code, val, shift, k, lisp.pat, lisp.length)
-     if ctrl then
-        if code == 45 then 
-            tracker:copy(lisp.pat[tracker.pos.y][tracker.pos.x])
-            lisp.pat[tracker.pos.y][tracker.pos.x] = nil
-        elseif code == 46 then 
-            tracker:copy(lisp.pat[tracker.pos.y][tracker.pos.x])
-        elseif code == 47 then
-            lisp.pat[tracker.pos.y][tracker.pos.x] = tracker:paste()
-        end
-      elseif val > 0 and shift and (code >= 5 or code >= 2) then
-        lisp.mute[code - 1] = not lisp.mute[code - 1]
-      else
-        tracker:buildword(k, lisp.pat) 
-      end 
+local is_mute_shortcut = false
+function lisp.kb_code(c, val)
+  is_mute_shortcut = false
+  if lisp.live then repl:kb()
+  elseif lisp.tracker then
+    tracker.kb_code(c, val, lisp.pat, lisp.length)
+    local code = utils.tab_key(keyboard.codes, c)
+    if val > 0 and keyboard.shift() and (code <= 5 and code >= 2) then
+      is_mute_shortcut = true
+      lisp.mute[code - 1] = not lisp.mute[code - 1]
     end
-   if (code == 28) and val == 1 then if lisp.live then repl.evaluate(lisp) end end
-   if shift and ctrl then
-      if lisp.metro.playing then lisp.metro:stop() lisp:log('> stopped.')
-      else lisp.metro:start() lisp:log('> running..') end
-   end
+  end
+  if keyboard.state.ENTER then
+    if lisp.live then
+      repl.evaluate(lisp)
+    end
+  end
+  if keyboard.shift() and keyboard.ctrl() then
+    if lisp.metro.playing then
+      lisp.metro:stop() lisp:log('> stopped.')
+    else lisp.metro:start() lisp:log('> running..') end
+  end
+end
+
+function lisp.kb_char(k)
+  if lisp.live then repl:buildword(k)
+  elseif lisp.tracker then
+    tracker.kb_char(k)
+    if keyboard.ctrl() then
+      if k == 'x' then
+        tracker:copy(lisp.pat[tracker.pos.y][tracker.pos.x])
+        lisp.pat[tracker.pos.y][tracker.pos.x] = nil
+      elseif k == 'c' then
+        tracker:copy(lisp.pat[tracker.pos.y][tracker.pos.x])
+      elseif k == 'v' then
+        lisp.pat[tracker.pos.y][tracker.pos.x] = tracker:paste()
+      end
+    elseif is_mute_shortcut then
+      -- pass
+    else
+      tracker:buildword(k, lisp.pat)
+    end
+  end
 end
 
 lisp.enc = function(self, n, d)
@@ -56,11 +75,11 @@ lisp.init = function()
     local blinks = metro.init( function() lisp.blink = not lisp.blink end, 0.7)
     blinks:start()
     lisp.metro:add_clock_params()
-    lisp.metro.on_step = function() tracker.exec(lisp) end 
+    lisp.metro.on_step = function() tracker.exec(lisp) end
     engines.init()
    -- init environment
     lisp.std = lisp.Env({}, {}, {_find_= function() return nil end }) -- outer table doesn't exists
-    for k,_ in pairs(lisp.core) do lisp.help = lisp.help ..' '.. k end 
+    for k,_ in pairs(lisp.core) do lisp.help = lisp.help ..' '.. k end
     for k,v in pairs(stdlib) do lisp.std[k] = v lisp.help = lisp.help ..' '.. k  end -- functions
     for k = 1, 99 do lisp.pat[k] = {} end
 
@@ -82,7 +101,7 @@ lisp.collect = function(t,s,e)
    local args = {}
    for i = s, #t do
       local v = lisp.eval(t[i], e )
-      if v then  
+      if v then
         args[#args + 1] = v
       end
    end
@@ -104,22 +123,22 @@ lisp.eval = function (x, env)
    else
       if lisp.core[x[1]] then
          return lisp.core[x[1]](lisp, x, env)
-      elseif env:_find_(x[1]) then 
-            local proc = lisp.eval(x[1], env) 
-            if type(proc) == 'function' then  
+      elseif env:_find_(x[1]) then
+            local proc = lisp.eval(x[1], env)
+            if type(proc) == 'function' then
                local args = lisp.collect(x, 2, env)
                return proc(table.unpack(args)) or nil
-            else 
+            else
                local args = lisp.collect(x, 2, env)
                return proc(table.unpack(args)) or nil
             end
-          
+
     else
            local args = lisp.collect(x, 1, env)
            return args
          end
       end
-   
+
 end
 
 -- User defined procedure (lambda)
@@ -141,7 +160,7 @@ lisp.tree = function (tok)
       while tok[1] ~= ')' do
         tbl[#tbl + 1] = lisp.tree(tok)
       end
-      table.remove(tok, 1)        
+      table.remove(tok, 1)
       return tbl
    else
       return t ~= ')' and t or lisp.err("syntax error")
@@ -173,7 +192,7 @@ lisp.err = function(msg)
 end
 
 lisp.redraw = function()
-  if lisp.live then repl.render(lisp, lisp.blink) 
+  if lisp.live then repl.render(lisp, lisp.blink)
   elseif lisp.tracker then tracker.render(lisp)
   end
 
