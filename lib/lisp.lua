@@ -169,11 +169,28 @@ end
 
 -- Get tokens
 lisp.parse = function (s)
-   s = s:gsub(';+.-\n', '\n')                                     -- remove comments
-   s = s:gsub('[()\']', {['(']=' ( ',[')']=' ) ', ['\'']=' \' '}) -- white space as delimeter
-   local tok = {}
-   for w in s:gmatch('%S+') do tok[#tok + 1] = w end           -- parse
-   return lisp.tree(tok)
+  s = s:gsub(';+.-\n', '\n')                                     -- remove comments
+  s = s:gsub('[()\']', {['(']=' ( ',[')']=' ) ', ['\'']=' \' '}) -- white space as delimeter
+  local quotes = false
+  local tok = {}
+  
+  for w in s:gmatch('%S+') do 
+    if(quotes) then
+      tok[#tok] = tok[#tok] .. ' ' .. w
+    else 
+      tok[#tok + 1] = w
+    end
+    
+    if(utils.startswith(w, '"')) then
+      quotes = true
+    end
+    
+    if(utils.endswith(w, '"')) then
+      quotes = false
+    end
+  end
+
+  return lisp.tree(tok)
 end
 
 

@@ -23,6 +23,14 @@ utils.join = function(a, b)
   end
 end
 
+utils.startswith(text, prefix)
+  return text:find(prefix, 1, true) == 1
+end
+
+utils.endswith(text, suffix)
+  return text:sub(-string.len(suffix)) == suffix
+end
+
 utils.tostring = function (lst, f)
   if type(lst) ~= 'table' then return tostring(lst) end
   local str = {}
