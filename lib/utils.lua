@@ -23,11 +23,11 @@ utils.join = function(a, b)
   end
 end
 
-utils.startswith(text, prefix)
+utils.startswith = function(text, prefix)
   return text:find(prefix, 1, true) == 1
 end
 
-utils.endswith(text, suffix)
+utils.endswith = function(text, suffix)
   return text:sub(-string.len(suffix)) == suffix
 end
 
